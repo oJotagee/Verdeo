@@ -1,98 +1,152 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Verdeo — API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Monorepo NestJS com arquitetura de microserviços para o backend do Verdeo. Organizado com workspaces Yarn e NestJS CLI Monorepo Mode.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Estrutura
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ yarn install
+```
+api/
+├── apps/
+│   ├── bff/              # Backend for Frontend — entrada HTTP para o web
+│   ├── auth-api/         # Autenticação e validação de JWT
+│   ├── user-api/         # Gerenciamento de usuários
+│   ├── order-api/        # Pedidos e orquestração de saga
+│   ├── stock-api/        # Controle de estoque
+│   └── audit-consumer/   # Consumer RabbitMQ para auditoria
+└── libs/
+    ├── core-cqrs/        # Abstrações de Command/Query
+    ├── core-domain/      # Entidades e value objects base
+    ├── core-events/      # Contratos de eventos de domínio
+    ├── core-resilience/  # Circuit breaker (opossum), retry
+    ├── core-saga/        # Orquestração de sagas distribuídas
+    └── core-shared/      # Utilitários e helpers compartilhados
 ```
 
-## Compile and run the project
+## Tecnologias
+
+| Camada | Tecnologia |
+|---|---|
+| Framework | NestJS 11 + TypeScript |
+| ORM | Prisma 7 (PostgreSQL) |
+| Banco NoSQL | Mongoose (MongoDB) |
+| Mensageria | RabbitMQ via `@nestjs/microservices` + `amqplib` |
+| Cache | Redis via `ioredis` |
+| Auth | JWT (`@nestjs/jwt`) + bcryptjs |
+| Resiliência | Circuit breaker com `opossum` |
+| Padrão de erro | `neverthrow` (Result type) |
+| Testes | Jest + Testcontainers |
+| Docs HTTP | Swagger (`@nestjs/swagger`) |
+| Observabilidade | Pino + pino-pretty |
+
+## Pré-requisitos
+
+- Node.js 20+
+- Yarn
+- Docker + Docker Compose
+
+## Instalação
 
 ```bash
-# development
-$ yarn run start
-
-# watch mode
-$ yarn run start:dev
-
-# production mode
-$ yarn run start:prod
+yarn install
 ```
 
-## Run tests
+## Infraestrutura
+
+Suba PostgreSQL, MongoDB, RabbitMQ e Redis com:
 
 ```bash
-# unit tests
-$ yarn run test
-
-# e2e tests
-$ yarn run test:e2e
-
-# test coverage
-$ yarn run test:cov
+docker-compose up -d
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## Banco de dados
 
 ```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
+# Gerar client do Prisma
+yarn prisma:generate
+
+# Criar/executar migrations
+yarn prisma:migrate
+
+# Popular dados base
+yarn prisma:seed
+
+# Popular apenas dados core (sem fixtures de teste)
+yarn seed:core
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## Rodando os serviços
 
-## Resources
+Todos os serviços em paralelo:
 
-Check out a few resources that may come in handy when working with NestJS:
+```bash
+yarn start:dev
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+Serviço individual:
 
-## Support
+```bash
+yarn start:dev:bff
+yarn start:dev:auth
+yarn start:dev:user
+yarn start:dev:stock
+yarn start:dev:order
+yarn start:dev:audit
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Testes
 
-## Stay in touch
+```bash
+# Unitários
+yarn test
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+# Cobertura
+yarn test:cov
 
-## License
+# E2E (requer Docker para Testcontainers)
+yarn test:e2e
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Serviços
+
+### BFF (`apps/bff`)
+
+Backend for Frontend. Ponto de entrada HTTP para o cliente web. Responsável por agregar respostas e repassar requisições autenticadas aos microserviços internos.
+
+### auth-api (`apps/auth-api`)
+
+Validação de tokens JWT e autenticação. Expõe endpoints de login/logout e fornece guards de autorização consumidos pelo BFF.
+
+### user-api (`apps/user-api`)
+
+CRUD e gerenciamento de perfil de usuários. Persiste em PostgreSQL via Prisma.
+
+### order-api (`apps/order-api`)
+
+Criação e gestão de pedidos. Inicia a saga `order.created → inventory.reserved/failed` publicando eventos no RabbitMQ.
+
+### stock-api (`apps/stock-api`)
+
+Controle de estoque. Consome eventos do RabbitMQ para reservar ou liberar itens e responde ao fluxo de saga do `order-api`.
+
+### audit-consumer (`apps/audit-consumer`)
+
+Consumer dedicado ao RabbitMQ para persistir logs de auditoria de todas as operações críticas do sistema.
+
+## Libs compartilhadas
+
+| Lib | Responsabilidade |
+|---|---|
+| `core-cqrs` | Interfaces base de Command, Query e seus handlers |
+| `core-domain` | AggregateRoot, Entity, ValueObject base |
+| `core-events` | Contratos dos eventos de domínio publicados no broker |
+| `core-resilience` | Circuit breaker e retry wrapper com `opossum` |
+| `core-saga` | Orquestrador de sagas com compensações |
+| `core-shared` | Guards, decorators, pipes e filtros reutilizáveis |
+
+## Padrões arquiteturais
+
+- **Hexagonal Architecture** — domínio isolado de infra e transporte
+- **CQRS** — separação de leitura e escrita via `@nestjs/cqrs`
+- **Saga Pattern** — consistência eventual em transações distribuídas
+- **Event-driven** — comunicação assíncrona via RabbitMQ
+- **Result type** — tratamento explícito de erros com `neverthrow`

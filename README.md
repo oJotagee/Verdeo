@@ -1,214 +1,150 @@
-# 🌱 Verdeo
+# Verdeo
 
-**Verdeo** é um projeto de estudo focado em arquitetura de microserviços utilizando **NestJS**, **Keycloak**, **RabbitMQ** e **monorepo**, com o objetivo de simular um ecossistema moderno de backend escalável e desacoplado.
+Projeto de estudo de arquitetura de microserviços com NestJS e Next.js. Simula um ecossistema moderno de backend escalável com frontend desacoplado, cobrindo comunicação síncrona e assíncrona, autenticação centralizada e consistência eventual.
 
----
-
-## 📌 Objetivo
-
-O projeto tem como objetivo praticar:
-
-* Arquitetura de **microserviços**
-* **Autenticação centralizada** com Keycloak
-* Comunicação assíncrona com **RabbitMQ**
-* Orquestração com **Saga Pattern**
-* Organização em **monorepo**
-* Integração entre frontend e múltiplos serviços
-
----
-
-## 🧱 Arquitetura
-
-A aplicação é composta pelos seguintes serviços:
+## Repositório
 
 ```
-web (Vite + React)
-       │
-       ▼
-api-gateway (NestJS)
-       │
-       ├── auth-service (Keycloak)
-       ├── orders-service
-       └── inventory-service
-
-Comunicação assíncrona:
-RabbitMQ (event-driven / saga)
+Verdeo/
+├── api/    # Monorepo NestJS (microserviços)
+└── web/    # Aplicação Next.js (em desenvolvimento)
 ```
 
 ---
 
-## 🚀 Tecnologias utilizadas
+## API (`api/`)
 
-### Backend
+Monorepo NestJS com múltiplos microserviços independentes gerenciados pelo NestJS CLI Monorepo Mode e Yarn Workspaces.
 
-* NestJS
-* Prisma
-* PostgreSQL
-* RabbitMQ
+### Serviços
 
-### Autenticação
+| Serviço | Descrição |
+|---|---|
+| `bff` | Backend for Frontend — entrada HTTP do cliente web |
+| `auth-api` | Autenticação e validação de JWT |
+| `user-api` | Gerenciamento de usuários |
+| `order-api` | Pedidos e orquestração da saga |
+| `stock-api` | Controle de estoque |
+| `audit-consumer` | Consumer RabbitMQ para auditoria |
 
-* Keycloak
-* JWT (OIDC)
+### Libs internas
 
-### Frontend
+| Lib | Responsabilidade |
+|---|---|
+| `core-cqrs` | Interfaces de Command, Query e handlers |
+| `core-domain` | AggregateRoot, Entity e ValueObject base |
+| `core-events` | Contratos dos eventos de domínio |
+| `core-resilience` | Circuit breaker e retry com `opossum` |
+| `core-saga` | Orquestrador de sagas com compensações |
+| `core-shared` | Guards, decorators, pipes e filtros reutilizáveis |
 
-* Vite
-* React
+### Stack
 
-### Infra
+- **NestJS 11** + TypeScript
+- **Prisma 7** (PostgreSQL) + **Mongoose** (MongoDB)
+- **RabbitMQ** — comunicação assíncrona e event-driven
+- **Redis** — cache via `ioredis`
+- **JWT** — autenticação stateless
+- **opossum** — circuit breaker
+- **neverthrow** — tratamento explícito de erros (Result type)
+- **Jest** + **Testcontainers** — testes unitários e E2E
 
-* Docker + Docker Compose
-* Monorepo (workspaces)
-
----
-
-## 🔐 Autenticação
-
-O projeto utiliza o Keycloak como provedor de identidade.
-
-### Fluxo de autenticação
-
-1. Usuário acessa o frontend
-2. Redirecionamento para login no Keycloak
-3. Keycloak autentica e retorna um **access token (JWT)**
-4. Frontend envia o token para o `api-gateway`
-5. Gateway valida ou delega validação ao `auth-service`
-6. Requisição segue para os microserviços
-
-### Responsabilidade do `auth-service`
-
-* Validação de token JWT
-* Integração com Keycloak
-* Obtenção de dados do usuário
-* Tradução de roles/permissões
-
----
-
-## 🔄 Comunicação entre serviços
-
-A comunicação entre microserviços acontece via:
-
-* HTTP (via `api-gateway`)
-* Eventos assíncronos com RabbitMQ
-
----
-
-## 🔁 Saga Pattern
-
-A orquestração de processos distribuídos é feita utilizando o **Saga Pattern**.
-
-### Exemplo de fluxo
-
-1. `orders-service` cria pedido
-2. Publica evento: `order.created`
-3. `inventory-service` tenta reservar estoque
-4. Retorna:
-
-   * `inventory.reserved` → pedido confirmado
-   * `inventory.failed` → pedido cancelado (compensação)
-
----
-
-## 📦 Serviços
-
-### 🔑 auth-service
-
-Responsável por autenticação e identidade:
-
-* Login / validação
-* Integração com Keycloak
-* Gerenciamento de usuário autenticado
-
----
-
-### 📦 orders-service
-
-Responsável por pedidos:
-
-* Criação de pedidos
-* Início da saga
-* Atualização de status
-
----
-
-### 📦 inventory-service
-
-Responsável por estoque:
-
-* Consulta de disponibilidade
-* Reserva de itens
-* Liberação em caso de falha
-
----
-
-### 🌐 api-gateway
-
-Ponto de entrada da aplicação:
-
-* Recebe requisições do frontend
-* Valida autenticação
-* Encaminha para microserviços
-
----
-
-## 🐳 Infraestrutura
-
-O projeto utiliza Docker para subir os serviços:
-
-### Serviços disponíveis
-
-* PostgreSQL
-* Keycloak
-* RabbitMQ
-
-### Subir ambiente
+### Rodar a API
 
 ```bash
-docker-compose up -d
-```
-
----
-
-## ▶️ Como rodar o projeto
-
-### 1. Instalar dependências
-
-```bash
+cd api
 yarn install
+docker-compose up -d        # PostgreSQL, MongoDB, RabbitMQ, Redis
+yarn prisma:generate
+yarn prisma:migrate
+yarn start:dev              # sobe todos os serviços em paralelo
 ```
 
-### 2. Subir infraestrutura
-
-```bash
-docker-compose up -d
-```
-
-## 📚 Conceitos aplicados
-
-* Microserviços
-* API Gateway
-* Saga Pattern
-* Event-driven architecture
-* Autenticação centralizada
-* Monorepo
+> Veja [api/README.md](api/README.md) para documentação completa da API.
 
 ---
 
-## 🎯 Objetivo educacional
+## Web (`web/`)
 
-Este projeto não tem foco em produção, mas sim em aprendizado prático de:
+Frontend em desenvolvimento. Será implementado com **Next.js** e consumirá o BFF da API.
 
-* Arquiteturas modernas
-* Boas práticas com NestJS
-* Integração entre serviços distribuídos
+### Stack planejada
+
+- **Next.js** (App Router)
+- **TypeScript**
+- Autenticação via JWT integrada ao `auth-api`
+- Comunicação exclusiva com o `bff`
+
+### Estrutura planejada
+
+```
+web/
+├── app/          # App Router do Next.js
+├── components/   # Componentes React reutilizáveis
+├── lib/          # Utilitários, hooks e clientes HTTP
+└── ...
+```
 
 ---
 
-## 🧠 Próximos passos
+## Arquitetura
 
-* Implementar cache com Redis
-* Adicionar observabilidade (logs + tracing)
-* Criar testes e2e
-* Implementar circuit breaker
-* Adicionar rate limiting no gateway
+```
+  [web — Next.js]
+        │  HTTP
+        ▼
+  [bff — NestJS]
+        │
+        ├── [auth-api]   — JWT / autenticação
+        ├── [user-api]   — usuários
+        ├── [order-api]  — pedidos
+        └── [stock-api]  — estoque
+
+  Comunicação assíncrona:
+  [order-api] ──▶ RabbitMQ ──▶ [stock-api]
+                      │
+                      └──▶ [audit-consumer]
+```
+
+### Saga: criação de pedido
+
+```
+order-api cria pedido
+    │ publica order.created
+    ▼
+stock-api tenta reservar estoque
+    ├── inventory.reserved  → pedido confirmado
+    └── inventory.failed    → compensação (pedido cancelado)
+```
+
+---
+
+## Padrões aplicados
+
+- **Hexagonal Architecture** — domínio isolado de infra e transporte
+- **CQRS** — separação de leitura e escrita
+- **Saga Pattern** — consistência eventual em transações distribuídas
+- **Event-driven Architecture** — comunicação assíncrona via RabbitMQ
+- **BFF Pattern** — Backend for Frontend dedicado ao cliente web
+- **Result type** — tratamento explícito de erros sem exceções
+
+---
+
+## Pré-requisitos
+
+- Node.js 20+
+- Yarn
+- Docker + Docker Compose
+
+---
+
+## Objetivo educacional
+
+Estudo prático de arquiteturas modernas de software, cobrindo:
+
+- Microserviços com NestJS em monorepo
+- Comunicação síncrona (HTTP) e assíncrona (RabbitMQ)
+- Consistência eventual com Saga Pattern
+- Autenticação stateless com JWT
+- Resiliência com circuit breaker
+- Frontend desacoplado com Next.js
