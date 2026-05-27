@@ -1,0 +1,69 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": [
+      "jest",
+      "node"
+    ],
+    "paths": {
+      "@app/core-domain": [
+        "./libs/core-domain/src/index"
+      ],
+      "@app/core-domain/*": [
+        "./libs/core-domain/src/*"
+      ],
+      "@app/core-cqrs": [
+        "./libs/core-cqrs/src/index"
+      ],
+      "@app/core-cqrs/*": [
+        "./libs/core-cqrs/src/*"
+      ],
+      "@app/core-shared": [
+        "./libs/core-shared/src/index"
+      ],
+      "@app/core-shared/*": [
+        "./libs/core-shared/src/*"
+      ],
+      "@app/core-events": [
+        "./libs/core-events/src/index"
+      ],
+      "@app/core-events/*": [
+        "./libs/core-events/src/*"
+      ],
+      "@app/core-resilience": [
+        "./libs/core-resilience/src/index"
+      ],
+      "@app/core-resilience/*": [
+        "./libs/core-resilience/src/*"
+      ],
+      "@app/core-saga": [
+        "./libs/core-saga/src/index"
+      ],
+      "@app/core-saga/*": [
+        "./libs/core-saga/src/*"
+      ],
+      "@generated/prisma": [
+        "./generated/prisma/client"
+      ],
+      "@generated/prisma/*": [
+        "./generated/prisma/client/*"
+      ]
+    }
+  }
+}
