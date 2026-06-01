@@ -9,6 +9,9 @@ up-dev:
 down:
 	docker compose -f docker-compose.yml down
 
+down-dev:
+	docker compose -f docker-compose.dev.yml down
+
 clean:
 	docker compose -f docker-compose.yml down -v --remove-orphans
 
