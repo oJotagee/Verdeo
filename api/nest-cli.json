@@ -7,7 +7,9 @@
   "compilerOptions": {
     "webpack": false,
     "tsConfigPath": "apps/bff/tsconfig.app.json",
-    "deleteOutDir": true
+    "deleteOutDir": true,
+    "plugins": [],
+    "assets": []
   },
   "projects": {
     "bff": {
