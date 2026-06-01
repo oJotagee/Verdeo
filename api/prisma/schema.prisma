@@ -16,7 +16,7 @@ enum OrderStatus {
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id        String   @id @default(uuid()) @db.Uuid
   email     String   @unique @db.VarChar(150)
   username  String   @unique @db.VarChar(50)
   password  String   @db.VarChar(255)
