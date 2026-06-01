@@ -51,7 +51,8 @@ export default tseslint.config(
       "@typescript-eslint/no-unnecessary-type-assertion": "off",
       "no-console": "off",
       "@typescript-eslint/explicit-function-return-type": "off",
-      "@typescript-eslint/only-throw-error": "off"
+      "@typescript-eslint/only-throw-error": "off",
+      "@typescript-eslint/no-misused-promises": "off"
     },
   },
 );

@@ -1,0 +1,112 @@
+{
+  "rabbit_version": "3.12.0",
+  "vhosts": [
+    {
+      "name": "/"
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "plant.events",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true,
+      "auto_delete": false
+    },
+    {
+      "name": "plant.dlx",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false
+    }
+  ],
+  "queues": [
+    {
+      "name": "audit.user.events",
+      "vhost": "/",
+      "durable": true,
+      "arguments": {
+        "x-dead-letter-exchange": "plant.dlx",
+        "x-dead-letter-routing-key": "audit.user.events.dead"
+      }
+    },
+    {
+      "name": "audit.order.events",
+      "vhost": "/",
+      "durable": true,
+      "arguments": {
+        "x-dead-letter-exchange": "plant.dlx",
+        "x-dead-letter-routing-key": "audit.order.events.dead"
+      }
+    },
+    {
+      "name": "audit.stock.events",
+      "vhost": "/",
+      "durable": true,
+      "arguments": {
+        "x-dead-letter-exchange": "plant.dlx",
+        "x-dead-letter-routing-key": "audit.stock.events.dead"
+      }
+    },
+    {
+      "name": "plant.dead-letters",
+      "vhost": "/",
+      "durable": true,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "plant.events",
+      "vhost": "/",
+      "destination": "audit.user.events",
+      "destination_type": "queue",
+      "routing_key": "user.*"
+    },
+    {
+      "source": "plant.events",
+      "vhost": "/",
+      "destination": "audit.order.events",
+      "destination_type": "queue",
+      "routing_key": "order.*"
+    },
+    {
+      "source": "plant.events",
+      "vhost": "/",
+      "destination": "audit.stock.events",
+      "destination_type": "queue",
+      "routing_key": "stock.*"
+    },
+    {
+      "source": "plant.dlx",
+      "vhost": "/",
+      "destination": "plant.dead-letters",
+      "destination_type": "queue",
+      "routing_key": "audit.user.events.dead"
+    },
+    {
+      "source": "plant.dlx",
+      "vhost": "/",
+      "destination": "plant.dead-letters",
+      "destination_type": "queue",
+      "routing_key": "audit.order.events.dead"
+    },
+    {
+      "source": "plant.dlx",
+      "vhost": "/",
+      "destination": "plant.dead-letters",
+      "destination_type": "queue",
+      "routing_key": "audit.stock.events.dead"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ]
+}
