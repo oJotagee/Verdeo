@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Lottie from "lottie-react";
-import Link from "next/link";
+import Lottie from 'lottie-react';
+import Link from 'next/link';
 
-import animationData from "@/public/animation/404-2.json";
+import animationData from '@/public/animation/404-2.json';
 
 export default function NotFound() {
   return (
@@ -11,9 +11,7 @@ export default function NotFound() {
       <div className="w-full max-w-md">
         <Lottie animationData={animationData} loop autoplay />
       </div>
-      <h1 className="text-2xl font-semibold text-foreground mt-4 mb-2">
-        Página não encontrada
-      </h1>
+      <h1 className="text-2xl font-semibold text-foreground mt-4 mb-2">Página não encontrada</h1>
       <p className="text-muted-foreground text-center mb-8">
         A página que você está procurando não existe ou foi movida.
       </p>
