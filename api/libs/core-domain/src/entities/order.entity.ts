@@ -135,10 +135,7 @@ export class Order extends AggregateRoot<OrderId> {
     return new Order(OrderId.create(id), props);
   }
 
-  private transitionTo(
-    newStatus: OrderStatus,
-    correlationId?: string,
-  ): Result<void, OrderDomainError> {
+  private transitionTo(newStatus: OrderStatus): Result<void, OrderDomainError> {
     const allowed = VALID_TRANSITIONS[this._props.status];
 
     if (!allowed.includes(newStatus)) {
@@ -152,7 +149,7 @@ export class Order extends AggregateRoot<OrderId> {
   }
 
   confirm(correlationId?: string): Result<void, OrderDomainError> {
-    const result = this.transitionTo('CONFIRMED', correlationId);
+    const result = this.transitionTo('CONFIRMED');
 
     if (result.isOk()) {
       this.addDomainEvent(
@@ -195,7 +192,7 @@ export class Order extends AggregateRoot<OrderId> {
   deliver(correlationId?: string): Result<void, OrderDomainError> {
     if (this._props.status === 'DELIVERED') return err(OrderDomainError.orderAlreadyDelivered());
 
-    const result = this.transitionTo('DELIVERED', correlationId);
+    const result = this.transitionTo('DELIVERED');
 
     if (result.isOk()) {
       this.addDomainEvent(

@@ -1,17 +1,17 @@
 'use client';
 
-import * as React from 'react';
+import { ChevronDownIcon, XIcon, CheckIcon } from 'lucide-react';
 import { Combobox as ComboboxPrimitive } from '@base-ui/react';
+import * as React from 'react';
 
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from '@/components/ui/input-group';
-import { ChevronDownIcon, XIcon, CheckIcon } from 'lucide-react';
 
 const Combobox = ComboboxPrimitive.Root;
 
